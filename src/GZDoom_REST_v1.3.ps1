@@ -12,31 +12,43 @@ function Get-LatestVersionedScript {
         [Parameter(Mandatory)]
         [string]$BaseName,
 
-        [string]$Path = "."
+        [string[]]$Path = @(".", ".\lib")
     )
 
-    Write-Verbose "Searching for latest version of $BaseName in '$Path'"
+    foreach ($currentPath in $Path) {
 
-    $pattern = "${BaseName}_v*.ps1"
+        Write-Verbose "Searching for latest version of $BaseName in '$currentPath'"
 
-    $scripts = Get-ChildItem -Path $Path -Filter $pattern -File -ErrorAction Stop
+        $pattern = "${BaseName}_v*.ps1"
 
-    if (-not $scripts) {
-        throw "No matching scripts found for pattern '$pattern' in '$Path'."
+        # Try versioned files first
+        $scripts = Get-ChildItem -Path $currentPath -Filter $pattern -File -ErrorAction SilentlyContinue
+
+        if ($scripts) {
+
+            $latest = $scripts |
+                Sort-Object {
+                    if ($_.Name -match 'v(\d+(\.\d+)+)') {
+                        [version]$matches[1]
+                    }
+                    else {
+                        [version]"0.0"
+                    }
+                } -Descending |
+                Select-Object -First 1
+
+            return $latest
+        }
+
+        # Fallback to non-versioned file
+        $baseFile = Join-Path $currentPath "${BaseName}.ps1"
+
+        if (Test-Path $baseFile) {
+            return Get-Item $baseFile
+        }
     }
 
-    $latest = $scripts |
-        Sort-Object {
-            if ($_.Name -match 'v(\d+(\.\d+)+)') {
-                [version]$matches[1]
-            }
-            else {
-                [version]"0.0"
-            }
-        } -Descending |
-        Select-Object -First 1
-
-    return $latest
+    throw "No matching versioned or base script found for '$BaseName' in paths: $($Path -join ', ')"
 }
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------
