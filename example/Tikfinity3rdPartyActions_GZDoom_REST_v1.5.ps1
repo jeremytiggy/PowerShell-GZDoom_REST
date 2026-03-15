@@ -120,8 +120,16 @@ $Global:REST_API_Tikfinity_JSON_ExecuteThirdPartyAction = @'
     "username": "username",
     "nickname": "nickname",
     "profilePictureUrl": "https://about:blank",
-    "coins": 999,
-    "triggerTypeId": -1,
+    "giftId": 0,
+	"giftName": "giftName",
+	"coins": 999,
+	"repeatCount": 0,
+	"likeCount": 0,
+	"totalLikeCount": 0,
+	"subMonth": 0,
+	"emoteId": 0,
+	"comment": "chat message",
+	"triggerTypeId": -1,
     "tikfinityUserId": 123456789,
     "tikfinityUsername": "tikfinityUsername"
   }
