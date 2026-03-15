@@ -5,40 +5,43 @@ function Get-LatestVersionedScript {
         [Parameter(Mandatory)]
         [string]$BaseName,
 
-        [string]$Path = "."
+        [string[]]$Path = @(".", ".\lib")
     )
 
-    Write-Verbose "Searching for latest version of $BaseName in '$Path'"
+    foreach ($currentPath in $Path) {
 
-    $pattern = "${BaseName}_v*.ps1"
+        Write-Verbose "Searching for latest version of $BaseName in '$currentPath'"
 
-    # Try versioned files first
-    $scripts = Get-ChildItem -Path $Path -Filter $pattern -File -ErrorAction SilentlyContinue
+        $pattern = "${BaseName}_v*.ps1"
 
-    if ($scripts) {
+        # Try versioned files first
+        $scripts = Get-ChildItem -Path $currentPath -Filter $pattern -File -ErrorAction SilentlyContinue
 
-        $latest = $scripts |
-            Sort-Object {
-                if ($_.Name -match 'v(\d+(\.\d+)+)') {
-                    [version]$matches[1]
-                }
-                else {
-                    [version]"0.0"
-                }
-            } -Descending |
-            Select-Object -First 1
+        if ($scripts) {
 
-        return $latest
+            $latest = $scripts |
+                Sort-Object {
+                    if ($_.Name -match 'v(\d+(\.\d+)+)') {
+                        [version]$matches[1]
+                    }
+                    else {
+                        [version]"0.0"
+                    }
+                } -Descending |
+                Select-Object -First 1
+
+            return $latest
+        }
+
+        # Fallback to non-versioned file
+        $baseFile = Join-Path $currentPath "${BaseName}.ps1"
+
+        if (Test-Path $baseFile) {
+            return Get-Item $baseFile
+        }
     }
 
-    # Fallback to non-versioned file
-    $baseFile = Join-Path $Path "${BaseName}.ps1"
-
-    if (Test-Path $baseFile) {
-        return Get-Item $baseFile
-    }
-
-    throw "No matching versioned or base script found for '$BaseName' in '$Path'."
+    throw "No matching versioned or base script found for '$BaseName' in paths: $($Path -join ', ')"
 }
 # Include library REST Server
 # Include GZDoom_REST.ps1 pfunctions and variables
@@ -66,9 +69,9 @@ $Global:NamedPipe_Server_Name = 'GZD'
 $Global:NamedPipe_Server_Process = 'GZDoom'
 $Global:NamedPipe_Server_ResponseDelay = 28 #milliseconds
 $Global:NamedPipe_Server_ResponseTimeLimit = 5000 #milliseconds
-$Global:NamedPipe_Server_Debug = $true
+$Global:NamedPipe_Server_Debug = $false
 #GZDoom API Parameters
-$Global:GZDoom_PipeAPI_Debug = $true
+$Global:GZDoom_PipeAPI_Debug = $false
 # HTTP Parameters
 $Global:REST_Server_Port = 8832
 $Global:REST_Server_Uri = "http://127.0.0.1:$Global:REST_Server_Port/"
@@ -78,12 +81,12 @@ $Global:REST_Client_processName = "Tikfinity"
 $Global:REST_API_appInfo = 	@{
 						author = "Jeremy Tiggy"
 						name = "GZDoom Tikfinity API" 
-						version = "6.6.6"
+						version = "1.0"
 					}
 
-$Global:REST_API_Debug = $true
+$Global:REST_API_Debug = $false
 # GZDoom REST Parameters
-$Global:GZDoom_REST_Debug = $true
+$Global:GZDoom_REST_Debug = $false
 Write-Host "[GZDoom_REST] Parameters registered. May be overwritten." -ForegroundColor Yellow
 # REST API Data Definitions for Actions (Required) --------
 # Define action categories and their corresponding actions for the REST API
@@ -101,62 +104,12 @@ try {
 }
 catch {
 
-    Write-Host "Failed to load external data file for RES_API_Actions. Using Internal values."
+    Write-Host "Failed to load external data file for RES_API_Actions. Quitting."
     Write-Host $_
 
-	$Global:REST_API_Actions = @{
-		cat1 = @{
-			categoryId   = "cat1"
-			categoryName = "Gift"
-
-			actions = @{
-				cat1action1 = @{
-					actionId    = "cat1action1"
-					actionName  = "Gift with Coins"
-					applicationData = "echo {{context.username}} has gifted {{context.coins}} coins"
-				}
-
-				cat1action2 = @{
-					actionId    = "cat1action2"
-					actionName  = "Gift over 100 coins"
-					applicationData = 'set CV_s_TF_username "{{context.username}}";set CV_s_TF_nickname "{{context.nickname}}";set CV_s_TF_sanitized_user "{{context.username}}";set CV_s_API_summon_classname "fatso";set CV_b_API_summon_buddy false;set CV_n_API_summon_size 2;set CV_n_API_summon_points 100;wait 35;set CV_b_API_dataReady true'
-				}
-			}
-		}
-
-		cat2 = @{
-			categoryId   = "cat2"
-			categoryName = "Command"
-
-			actions = @{
-				cat2action1 = @{
-					actionId    = "cat2action1"
-					actionName  = "!iddqd"
-					applicationData = "give InvulnerabilitySphere"
-				}
-
-				cat2action2 = @{
-					actionId    = "cat2action2"
-					actionName  = "!idkfa"
-					applicationData = "give weapons;give ammo"
-				}
-			}
-		}
-	}
-
+	exit 1
 }
 
-
-
-$Global:REST_API_JSON_ExecuteThirdPartyAction = @'
-{
-  "categoryId": "categoryId",
-  "actionId": "actionId",
-  "context": {
-    "applicationData": "applicationData"
-  }
-}
-'@
 
 $Global:REST_API_Tikfinity_JSON_ExecuteThirdPartyAction = @'
 {
@@ -174,6 +127,54 @@ $Global:REST_API_Tikfinity_JSON_ExecuteThirdPartyAction = @'
   }
 }
 '@
+
+function REST_API_Application-Specific-Action {
+	#Send Tikfinity Client Action Data to GZDoom
+	# For this application, we are just using a few members
+	# Because JSON data isn't always guaranteed, we use this helper function to safely get the value
+	$categoryId = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'categoryId'
+	# Another way to get data from the Tikfinity data is to use the available placeholder substitution logic. {{placeholder}}
+	$actionId_with_placeholder = '{{actionId}}'
+	$actionId = Replace-PlaceholdersWithValues -stringContainingPlaceholders $actionId_with_placeholder -objectWithValues $Global:REST_API_clientActionData
+	# where this has EXTREME value, is to pass TikFinity values to GZDoom inside of commandString
+	#for example:
+	# action: applicationData = 'echo "Thank you for the gift of {{context.coins}}, dear {{context.nickname}}!"
+	# if you assign this to the applicationData of a particular action, you can send this to the screen with the persons' user nick name!
+	# $actionId = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'actionId'
+	$context_username = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.username'
+	$context_nickname = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.nickname'
+	$context_coins = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.coins'
+	$context_triggerTypeId = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.triggerTypeId'
+	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_categoryId' -cvarValue $categoryId
+	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_actionId' -cvarValue $actionId
+	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_username' -cvarValue $context_username
+	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_nickname' -cvarValue $context_nickname
+	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_coins' -cvarValue $context_coins
+	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_triggerTypeId' -cvarValue $context_triggerTypeId
+	
+	
+	#GZDoom_REST Action - Execute applicationData-based dynamic Console Command
+	$local_action = $Global:REST_API_Action
+	if ($Global:REST_API_Debug) { 
+		Write-Host "[REST_API_Application-Specific-Action]: DEBUG - printing local action" -ForegroundColor Gray 
+		Show-ObjectProperties -Obj $local_action
+	}
+	$local_actionApplicationData = ""
+	if ($null -ne $local_action.applicationData) {
+		$local_actionApplicationData = $local_action.applicationData
+	} else { Write-Host "[REST_API_Application-Specific-Action]: FAULT - applicationData is null" -ForegroundColor Red }
+	if ($Global:REST_API_Debug) { Write-Host "[GZDoom_REST_Application-Specific-Action]: Dynamic Console Command Base: $($local_actionApplicationData)" }
+	$consoleCommand = Replace-PlaceholdersWithValues -stringContainingPlaceholders $local_actionApplicationData -objectWithValues $Global:REST_API_clientActionData
+	if ($Global:REST_API_Debug) { Write-Host "[GZDoom_REST_Application-Specific-Action]: Dynamic Console Command: $($consoleCommand)" }
+	$Global:GZDoom_REST_Action_CONSOLE_COMMAND = $consoleCommand
+	$null = GZDoom_PipeAPI_CONSOLE_COMMAND -commandString $Global:GZDoom_REST_Action_CONSOLE_COMMAND
+
+	$Global:REST_API_Action_ApplicationDataAvailable = $true
+	
+	#Tikfinity: We then signal to the running ACS script within TikFinity_REST_API_clientActionData.pk3 that the data is ready
+	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_b_API_dataReady' -cvarValue 1
+}
+
 Write-Host "[GZDoom_REST] Action Categories & Definitions registered. May be overwritten." -ForegroundColor Yellow
 # REST API Data Definitions for Actions ^^^^^^^^^^^^^^^^
 
@@ -307,21 +308,24 @@ function Convert-ToOriginalType {
 
 # Main Program Loop -------------------------------
 # ask if user wants to enable debugging
+Write-Host "`n[Startup]: You will be asked if you would like to enable debugging for `n various sub-systems.`n This is helpful to be able to get support." -ForegroundColor Cyan
+Write-Host "`n[Startup]: Enabling them doesn't hurt anything tho and gives you lots of status information, especially if you're trying to learn the system." -ForegroundColor Cyan
+Write-Host "[Startup]: Normal operation is no to each. Enabling them doesn't hurt anything tho and gives you lots of status information." -ForegroundColor Cyan
 if ($Global:NamedPipe_Server_Debug -eq $false) {
-	Write-Host "'n[Startup]: Enable Pipe Debugging Messages?" -ForegroundColor Cyan
+	Write-Host "`n[Startup]: Enable Pipe Debugging Messages?" -ForegroundColor Cyan
 	Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
 	$enablePipeDebugging = Read-Host
 	if ($enablePipeDebugging -eq 'yes') { $Global:NamedPipe_Server_Debug = $true }
 }
 
 if ($Global:GZDoom_PipeAPI_Debug -eq $false) {
-	Write-Host "'n[Startup]: Enable GZDoom Pipe Debugging Messages?" -ForegroundColor Cyan
+	Write-Host "`n[Startup]: Enable GZDoom Pipe Debugging Messages?" -ForegroundColor Cyan
 	Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
 	$enableGZDoomPipeAPIdebugging = Read-Host
 	if ($enableGZDoomPipeAPIdebugging -eq 'yes') { $Global:GZDoom_PipeAPI_Debug = $true }
 }
 if ($Global:REST_Server_Debug -eq $false) {
-	Write-Host "'n[Startup]: Enable Server Debugging Messages?" -ForegroundColor Cyan
+	Write-Host "`n[Startup]: Enable HTTP Server Debugging Messages?" -ForegroundColor Cyan
 	Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
 	$enableServerDebugging = Read-Host
 	if ($enableServerDebugging -eq 'yes') { $Global:REST_Server_Debug = $true }
@@ -339,6 +343,9 @@ if ($Global:GZDoom_REST_Debug -eq $false) {
 	if ($enable_GZDoom_REST_Debugging -eq 'yes') { $Global:GZDoom_REST_Debug = $true }
 }
 
+Write-Host "[Startup] Next, you will be asked if you would like to start up the Pipe and the REST server." -ForegroundColor Cyan
+Write-Host "[Startup] It will check and advise you if either GZDoom or Tikfinity is not running." -ForegroundColor Cyan
+Write-Host "[Startup] Normal choices are:`nPipe: open`nServer: start" -ForegroundColor Cyan
 Write-Host "[Startup]: Starting communications..." -ForegroundColor White
 GZDoom_REST_Startup
 
@@ -355,36 +362,47 @@ if ($Global:REST_Server_Running) {
 }
 
 
+if ($Global:NamedPipe_Client_ConnectedToServer -and $Global:REST_Server_Running) {
+	$automatic = $true
+	Write-Host "[Startup]: The Pipe is connected and the Server is running. Press Enter to continue in Automatic Mode" -ForegroundColor Green
+	Write-Host "[Startup]: Type 'manual' to continue in Manual Mode (you can always enter Auto later)" -ForegroundColor Cyan
+	Write-Host -NoNewLine "[Startup]: (manual|leave blank and hit enter for auto) > "
+	$cmd = Read-Host
+	if ($cmd -eq 'manual') { $automatic = $false }
+} else {
+	$automatic = $false
+}
+Write-Host "`n[Startup]: ." -ForegroundColor Cyan
 
 Write-Host "`n[Startup]: Starting main loop..." -ForegroundColor White
-$automatic = $false
+
 try {
     while ($true) {
 		if ($automatic -eq $false)
 		{
-			Write-Host "[Main Loop]: To quit, type 'exit'."
+			Write-Host "[Main Loop]: To quit, type 'exit'." -ForegroundColor Cyan
 			$userCommandPromptString = "[Main Loop]: Enter Command (exit"
 			#REST
 			if ($Global:REST_Server_Running -eq $false) { 
-				Write-Host "[Main Loop]: Type 'listen' to start the REST HTTP Server on $Global:REST_Server_Uri"
+				Write-Host "[Main Loop]: Type 'listen' to start the REST HTTP Server on $Global:REST_Server_Uri" -ForegroundColor Cyan
 				$userCommandPromptString+= "|listen" 
 			}
 			if ($Global:REST_Server_Running -eq $true) { 
-				Write-Host "[Main Loop]: Type 'block' to wait for a HTTP request." 
+				Write-Host "[Main Loop]: Type 'block' to wait for a HTTP request."  -ForegroundColor Cyan
 				$userCommandPromptString+= "|block" 
 			}
-			Write-Host "[Main Loop]: Type 'simulate' to manually put together an event with data."
+			Write-Host "[Main Loop]: Type 'simulate' to manually put together an event with data." -ForegroundColor Cyan
 			$userCommandPromptString+= "|simulate"
 			
 			#PIPE
 			if ($Global:NamedPipe_Client_ConnectedToServer -eq $false) { 
-				Write-Host "[Main Loop]: Type 'open' to start a Named Pipe connection. (current target is '$($Global:NamedPipe_Server_Name) @ $($Global:NamedPipe_Server_Process)')"
+				Write-Host "[Main Loop]: Type 'open' to start a Named Pipe connection. (current target is '$($Global:NamedPipe_Server_Name) @ $($Global:NamedPipe_Server_Process)')" -ForegroundColor Cyan
 				$userCommandPromptString+= "|open" }
 			if ($Global:NamedPipe_Client_ConnectedToServer -eq $true) { 
-				Write-Host "[Main Loop]: Type 'close' to end the Named Pipe connection '$($Global:NamedPipe_Server_Name) @ $($Global:NamedPipe_Server_Process)'"
+				Write-Host "[Main Loop]: Type 'close' to end the Named Pipe connection '$($Global:NamedPipe_Server_Name) @ $($Global:NamedPipe_Server_Process)'" -ForegroundColor Cyan
 				$userCommandPromptString+= "|close" }
 			if ( ($Global:REST_Server_Running -eq $true) -and ($Global:NamedPipe_Client_ConnectedToServer -eq $true) ) {
-				Write-Host "[Main Loop]: Type 'auto' to leave manual control and send REST Actions continuously to GZDoom."
+				Write-Host "[Main Loop]: Type 'auto' to leave manual control and send REST Actions continuously to GZDoom." -ForegroundColor Cyan
 				$userCommandPromptString+= "|auto"
 			}
 			
