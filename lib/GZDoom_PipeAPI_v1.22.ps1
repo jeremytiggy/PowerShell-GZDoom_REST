@@ -281,9 +281,6 @@ function GZDoom_PipeAPI_CVAR_SET {
 	} elseif ($cvarValue -eq $null) {
 		Write-Host "[GZDoom_PipeAPI_CVAR_SET]: FAULT - null cvarValue" -ForegroundColor Red
 		return $false
-	} elseif ($cvarValue -eq "") {
-		Write-Host "[GZDoom_PipeAPI_CVAR_SET]: FAULT - empty cvarValue" -ForegroundColor Red
-		return $false
 	}
 	$cvarName = [string]$cvarName
 	$cvarValue = [string]$cvarValue
