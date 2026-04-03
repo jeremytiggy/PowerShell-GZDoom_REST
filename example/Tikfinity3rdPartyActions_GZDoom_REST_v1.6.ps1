@@ -149,16 +149,41 @@ function REST_API_Application-Specific-Action {
 	# action: applicationData = 'echo "Thank you for the gift of {{context.coins}}, dear {{context.nickname}}!"
 	# if you assign this to the applicationData of a particular action, you can send this to the screen with the persons' user nick name!
 	# $actionId = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'actionId'
+	$context_userID = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.userID'
 	$context_username = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.username'
 	$context_nickname = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.nickname'
+	$context_profilePictureUrl = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.profilePictureUrl'
+	$context_giftId = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.giftId'
+	$context_giftName = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.giftName'
 	$context_coins = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.coins'
+	$context_repeatCount = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.repeatCount'
+	$context_likeCount = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.likeCount'
+	$context_totalLikeCount = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.totalLikeCount'
+	$context_subMonth = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.subMonth'
+	$context_emoteId = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.emoteId'
+	$context_comment = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.comment'
 	$context_triggerTypeId = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.triggerTypeId'
-	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_categoryId' -cvarValue $categoryId
-	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_actionId' -cvarValue $actionId
-	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_username' -cvarValue $context_username
-	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_nickname' -cvarValue $context_nickname
-	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_coins' -cvarValue $context_coins
-	$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_triggerTypeId' -cvarValue $context_triggerTypeId
+	$context_tikfinityUserId = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.tikfinityUserId'
+	$context_tikfinityUsername = Get-MemberValueFromUnknownObject -objectWithUnknownMembers $Global:REST_API_clientActionData -targetMember_nameString 'context.tikfinityUsername'
+
+	if ($categoryId -ne $null) { $null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_categoryId' -cvarValue $categoryId }
+	if ($actionId -ne $null) { $null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_actionId' -cvarValue $actionId }
+	if ($context_userID -ne $null) { $null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_userID' -cvarValue $context_userID }
+	if ($context_username -ne $null) { $null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_username' -cvarValue $context_username}
+	if ($context_nickname -ne $null) { $null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_nickname' -cvarValue $context_nickname}
+	if ($context_profilePictureUrl -ne $null) { $null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_profilePictureUrl' -cvarValue $context_profilePictureUrl}
+	if ($context_giftName -ne $null) { $null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_giftName' -cvarValue $context_giftName}
+	if ($context_comment -ne $null) { $null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_comment' -cvarValue $context_comment}
+	if ($context_tikfinityUsername -ne $null) { $null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_s_TF_tikfinityUsername' -cvarValue $context_tikfinityUsername}
+	if ($context_giftId -ne $null) {$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_n_TF_giftId' -cvarValue $context_giftId }
+	if ($context_coins -ne $null) {$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_n_TF_coins' -cvarValue $context_coins}
+	if ($context_repeatCount -ne $null) {$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_n_TF_repeatCount' -cvarValue $context_repeatCount}
+	if ($context_likeCount -ne $null) {$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_n_TF_likeCount' -cvarValue $context_likeCount}
+	if ($context_totalLikeCount -ne $null) {$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_n_TF_totalLikeCount' -cvarValue $context_totalLikeCount}
+	if ($context_subMonth -ne $null) {$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_n_TF_subMonth' -cvarValue $context_subMonth}
+	if ($context_emoteId -ne $null) {$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_n_TF_emoteId' -cvarValue $context_emoteId}
+	if ($context_triggerTypeId -ne $null) {$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_n_TF_triggerTypeId' -cvarValue $context_triggerTypeId}
+	if ($context_tikfinityUserId -ne $null) {$null = GZDoom_PipeAPI_CVAR_SET -cvarName 'CV_n_TF_tikfinityUserId' -cvarValue $context_tikfinityUserId}
 	
 	
 	#GZDoom_REST Action - Execute applicationData-based dynamic Console Command
@@ -316,44 +341,63 @@ function Convert-ToOriginalType {
 
 # Main Program Loop -------------------------------
 # ask if user wants to enable debugging
-Write-Host "`n[Startup]: You will be asked if you would like to enable debugging for `n various sub-systems.`n This is helpful to be able to get support." -ForegroundColor Cyan
-Write-Host "`n[Startup]: Enabling them doesn't hurt anything tho and gives you lots of status information, especially if you're trying to learn the system." -ForegroundColor Cyan
-Write-Host "[Startup]: Normal operation is no to each. Enabling them doesn't hurt anything tho and gives you lots of status information." -ForegroundColor Cyan
-if ($Global:NamedPipe_Server_Debug -eq $false) {
-	Write-Host "`n[Startup]: Enable Pipe Debugging Messages?" -ForegroundColor Cyan
-	Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
-	$enablePipeDebugging = Read-Host
-	if ($enablePipeDebugging -eq 'yes') { $Global:NamedPipe_Server_Debug = $true }
+Write-Host "[Startup]: Would you like to start up in 'debug' mode or 'normal'?" -ForegroundColor Cyan
+Write-Host "           Type 'debug' to walk-thru each sub-system as it starts up." -ForegroundColor Cyan
+Write-Host "           This is helpful to be able to get support." -ForegroundColor Cyan
+Write-Host "           Type 'normal' or just hit Enter to continue in Automatic Mode." -ForegroundColor Cyan
+Write-Host -NoNewLine "[Enter Command (" -ForegroundColor White
+Write-Host -NoNewLine "debug" -ForegroundColor Yellow
+Write-Host -NoNewLine "|" -ForegroundColor White
+Write-Host -NoNewLine "normal or press enter to skip" -ForegroundColor Green
+Write-Host -NoNewLine ")]:> " -ForegroundColor White
+$enableDebuggingResponse = Read-Host
+$enableDebugging = $enableDebuggingResponse -eq 'debug'
+
+if ($enableDebugging) {
+	Write-Host "[Startup]: Type 'select' to pick which systems to debug."  -ForegroundColor Cyan
+	Write-Host "           Type 'all' or press Enter to print out information on everything." 
+	Write-Host -NoNewLine "[Enter Command (select|all or press enter to skip)]:> "
+	$selectDebuggingResponse = Read-Host
+	$selectDebug = $selectDebuggingResponse -eq 'select'
+	$debugAll = $selectDebuggingResponse -ne 'select'
+	if ($Global:GZDoom_PipeAPI_Debug -eq $false) {
+		if ($selectDebug) {
+			Write-Host "`n[Startup]: Enable Pipe Debugging Messages?" -ForegroundColor Cyan
+			Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
+			$enableGZDoomPipeAPIdebugging = Read-Host
+			$debugGZDoomPipeAPI = $enableGZDoomPipeAPIdebugging -eq 'yes'
+		} else { $debugGZDoomPipeAPI = $true}
+		$Global:GZDoom_PipeAPI_Debug = $debugGZDoomPipeAPI
+	}
+	if ($Global:REST_Server_Debug -eq $false) {
+		if ($selectDebug) {
+			Write-Host "`n[Startup]: Enable HTTP Server Debugging Messages?" -ForegroundColor Cyan
+			Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
+			$enableServerDebugging = Read-Host
+			$debugServer = $enableServerDebugging -eq 'yes'
+		} else { $debugServer = $true }
+		$Global:REST_Server_Debug = $debugServer
+	}
+	if ($Global:REST_API_Debug -eq $false) {
+		if ($selectDebug) {
+			Write-Host "[Startup]: Enable REST API Debugging Messages?" -ForegroundColor Cyan
+			Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
+			$enable_REST_API_Debugging = Read-Host
+			$debugREST = $enable_REST_API_Debugging -eq 'yes'
+		} else { $debugREST = $true }
+		$Global:REST_API_Debug = $debugREST
+	}
+	if ($Global:GZDoom_REST_Debug -eq $false) {
+		if ($selectDebug) {
+			Write-Host "[Startup]: Enable GZDoom API Debugging Messages?" -ForegroundColor Cyan
+			Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
+			$enable_GZDoom_REST_Debugging = Read-Host
+			$debugGZDoomREST = $enable_GZDoom_REST_Debugging -eq 'yes'
+		} else { $debugGZDoomREST = $true }
+		$Global:GZDoom_REST_Debug = $debugGZDoomREST
+	}
 }
 
-if ($Global:GZDoom_PipeAPI_Debug -eq $false) {
-	Write-Host "`n[Startup]: Enable GZDoom Pipe Debugging Messages?" -ForegroundColor Cyan
-	Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
-	$enableGZDoomPipeAPIdebugging = Read-Host
-	if ($enableGZDoomPipeAPIdebugging -eq 'yes') { $Global:GZDoom_PipeAPI_Debug = $true }
-}
-if ($Global:REST_Server_Debug -eq $false) {
-	Write-Host "`n[Startup]: Enable HTTP Server Debugging Messages?" -ForegroundColor Cyan
-	Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
-	$enableServerDebugging = Read-Host
-	if ($enableServerDebugging -eq 'yes') { $Global:REST_Server_Debug = $true }
-}
-if ($Global:REST_API_Debug -eq $false) {
-	Write-Host "[Startup]: Enable REST API Debugging Messages?" -ForegroundColor Cyan
-	Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
-	$enable_REST_API_Debugging = Read-Host
-	if ($enable_REST_API_Debugging -eq 'yes') { $Global:REST_API_Debug = $true }
-}
-if ($Global:GZDoom_REST_Debug -eq $false) {
-	Write-Host "[Startup]: Enable GZDoom REST Debugging Messages?" -ForegroundColor Cyan
-	Write-Host -NoNewLine "[Enter Command (yes|no)]:> "
-	$enable_GZDoom_REST_Debugging = Read-Host
-	if ($enable_GZDoom_REST_Debugging -eq 'yes') { $Global:GZDoom_REST_Debug = $true }
-}
-
-Write-Host "[Startup] Next, you will be asked if you would like to start up the Pipe and the REST server." -ForegroundColor Cyan
-Write-Host "[Startup] It will check and advise you if either GZDoom or Tikfinity is not running." -ForegroundColor Cyan
-Write-Host "[Startup] Normal choices are:`nPipe: open`nServer: start" -ForegroundColor Cyan
 Write-Host "[Startup]: Starting communications..." -ForegroundColor White
 GZDoom_REST_Startup
 
@@ -372,15 +416,21 @@ if ($Global:REST_Server_Running) {
 
 if ($Global:NamedPipe_Client_ConnectedToServer -and $Global:REST_Server_Running) {
 	$automatic = $true
-	Write-Host "[Startup]: The Pipe is connected and the Server is running. Press Enter to continue in Automatic Mode" -ForegroundColor Green
-	Write-Host "[Startup]: Type 'manual' to continue in Manual Mode (you can always enter Auto later)" -ForegroundColor Cyan
-	Write-Host -NoNewLine "[Startup]: (manual|leave blank and hit enter for auto) > "
-	$cmd = Read-Host
-	if ($cmd -eq 'manual') { $automatic = $false }
+	Write-Host "[Startup]: The Pipe is connected and the Server is running. " -ForegroundColor Green
+	if ($enableDebugging) {
+		Write-Host "[Startup]: Press Enter to continue in Automatic Mode" -ForegroundColor Cyan
+		Write-Host "[Startup]: Type 'manual' to continue in Manual Mode (you can always enter Auto later)" -ForegroundColor Cyan
+		Write-Host -NoNewLine "[Startup]: (" -ForegroundColor White
+		Write-Host -NoNewLine "manual" -ForegroundColor Yellow
+		Write-Host -NoNewLine "|" -ForegroundColor White
+		Write-Host -NoNewLine "leave blank and hit enter for auto" -ForegroundColor Green
+		Write-Host -NoNewLine ") > " -ForegroundColor White
+		$cmd = Read-Host
+		if ($cmd -eq 'manual') { $automatic = $false }
+	}
 } else {
 	$automatic = $false
 }
-Write-Host "`n[Startup]: ." -ForegroundColor Cyan
 
 Write-Host "`n[Startup]: Starting main loop..." -ForegroundColor White
 
