@@ -7,10 +7,10 @@ In the future, this will include Streamer.bot. Tikfinity was considered first be
 
 Example Application Directions:
 1. Have Tikfinity installed and running.
-2. Unzip the example scripts and PK3 file to a directory.
-3. Unzip the modified GZDoom External-Pipe edition application to a different directory.
+2. Extract the archive containing the example scripts and PK3 file to a new directory.
+3. Extract the modified GZDoom External-Pipe edition application to a different directory.
 4. Depending on what your set up is...
-- To get started the fastest, use the directory and configuration file as is. The 'gzdoom_portable.ini' contains an autoload instruction for the 'addons' directory. Place the PK3 there to automatically load on startup.
+- To get started the fastest, Copy and paste the PK3 file from the example archive to the 'addons' subdirectory where you put the GZDoom files.
 - If you're using a loader like DoomRunner, add the PK3 to the load order.
 - You can successfully overwrite any GZDoom v4.14.2 installation by just replacing the 'gzdoom.exe' file with the one from the archive, and it will add Pipe functionality. Make sure to add the ExternalPipeSettingsMenu.pk3 from the addons directory to that load order.
 5. Start up GZDoom External Pipe edition, wait until the menu loads. Start or load a game.
