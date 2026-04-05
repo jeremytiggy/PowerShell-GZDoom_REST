@@ -5,21 +5,24 @@ The actions are loaded at runtime externally from the file 'GZDoom_REST_API_Acti
 This API, 'GZDoom_REST_vX.X.ps1', was written to be modified further for use with different streaming applications.
 In the future, this will include Streamer.bot. Tikfinity was considered first because of community need.
 
-Example Application Directions:
-1. Have Tikfinity installed and running.
-2. Extract the archive containing the example scripts and PK3 file to a new directory.
-3. Extract the modified GZDoom External-Pipe edition application to a different directory.
-4. Depending on what your set up is...
-- To get started the fastest, Copy and paste the PK3 file from the example archive to the 'addons' subdirectory where you put the GZDoom files.
-- If you're using a loader like DoomRunner, add the PK3 to the load order.
-- You can successfully overwrite any GZDoom v4.14.2 installation by just replacing the 'gzdoom.exe' file with the one from the archive, and it will add Pipe functionality. Make sure to add the ExternalPipeSettingsMenu.pk3 from the addons directory to that load order.
-5. Start up GZDoom External Pipe edition, wait until the menu loads. Start or load a game.
-6. Run the Powershell script 'Tikfinity3rdPartyActions_GZDoom_REST_vx.x.ps1'. Try to start up in normal automatic mode. If unsuccessful, try the debug mode to gather more information.
-7. Switch back to Tikfinity. Create or modify an action. Select Third Party Action. You should 'GZDoom Tikfinity API' and a version number.
-8. Select the Category and Action from the list.
-9. Click Test, and switch back to GZDoom to verify that it works.
-10. To add or modify actions, edit the file 'GZDoom_REST_API_Actions_vx.x.ps1'.
-11. To find out more about data placeholders, check out the function 'REST_API_Application-Specific-Action' in the main Powershell script.
+Start-up Instructions:
+
+1. Requires a functioning, configured installation of Tikfinity. Start it up, but do not go Live.
+2. Run the Installer, make sure "Create desktop shortcuts" is selected.
+3. Using it's desktop shortcut, Open the special version of GZDoom External Pipe v4.14.2 . Wait until it is fully loaded, all the way to the menu.
+4. Using it's desktop shortcut, open up Tikfinity-GZDoom (black and white icon with "TFGZ" in the Doom 2016 font).
+5. When the program asks you of you'd like to start up in debug or normal, hit enter.
+6. Wait until it finishes loading and shows magenta text "Waiting for incoming HTTP requests..."
+7. The system is now ready to receive commands from Tikfinity
+
+Tikfinity Third Party Actions test (TFGZ application MUST be running)
+1. Create or modify an Action.
+2. Scroll down to the checkbox for "Third Party Action"
+3. Select the checkbox.
+4. "Connected with GZDom Tikfinity API" should appear to the right.
+5. Select a category and action. For example, "Summon Friendly DOOM Monster In-Front-Of/Nearby Player", "Cacodemon".
+6. Click the "> Test" button below the selection.
+7. Switch back to GZDoom, and see if the action was successful.
 
 Version History
  - v1.3: Streamlined Start-up procedure
