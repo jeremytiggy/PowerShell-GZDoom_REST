@@ -139,9 +139,9 @@ $Global:REST_Server_Uri = "http://127.0.0.1:$Global:REST_Server_Port/"
 $Global:REST_Client_processName = "ProcessName"
 # REST API Application Information (Required)
 $Global:REST_API_appInfo = 	@{
-								author = "AUTHOR NAME"
-								name = "GZDoom_REST" 
-								version = "1.3"
+								author = "Jeremy Tiggy"
+								name = "ZDoom_REST" 
+								version = "1.4"
 							}
 
 $Global:REST_API_Debug = $true
