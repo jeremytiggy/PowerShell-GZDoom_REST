@@ -25,5 +25,6 @@ Tikfinity Third Party Actions test (TFGZ application MUST be running)
 7. Switch back to GZDoom, and see if the action was successful.
 
 Version History
+ - v1.4: New Pipe comm settings for GZD/UZD/ZZD
  - v1.3: Streamlined Start-up procedure
  - v1.1: Updates to GZDoom External-Pipe 
