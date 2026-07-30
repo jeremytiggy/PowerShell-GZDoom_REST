@@ -122,8 +122,11 @@ $Global:GZDoom_REST_Action_CONSOLE_COMMAND = $null
 # USER AND APPLICATION SPECIFIC DATA ------------------------------
 # Copy this section into your script to overwrite these values with application specific values
 # Pipe Parameters
-$Global:NamedPipe_Server_Name = 'GZD'
-$Global:NamedPipe_Server_Process = 'GZDoom'
+$Global:NamedPipe_Server_Name = 'Select'
+$Global:NamedPipe_Client_AvailablePipeSelection_Filter = $true
+$Global:NamedPipe_Client_AutomaticallySelectUniqueFilteredPipeServerName = $true
+$Global:NamedPipe_Client_AvailablePipeSelection_NamePattern = '^[ZUG]ZD(_\d+)?$'
+$Global:NamedPipe_Server_Process = 'ZDoom'
 $Global:NamedPipe_Server_ResponseDelay = 28 #milliseconds
 $Global:NamedPipe_Server_ResponseTimeLimit = 5000 #milliseconds
 $Global:NamedPipe_Server_Debug = $false
